@@ -113,6 +113,17 @@ app.use('/api/challans', challanRoutes); // Frontend compatibility
 app.use('/api/v1/pdf', pdfRoutes);
 app.use('/api/pdf', pdfRoutes); // Frontend compatibility
 
+// Add error handlers to prevent server crashes
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  // Don't exit the process, just log the error
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit the process, just log the error
+});
+
 // Start server
 app.listen(PORT, async () => {
   console.log(`🚀 Server is running on port ${PORT}`);
@@ -126,7 +137,12 @@ app.listen(PORT, async () => {
   console.log(`📋 Challans API available at: http://localhost:${PORT}/api/v1/challans`);
   
   // Test database connection on startup
-  await testDbConnection();
+  try {
+    await testDbConnection();
+  } catch (error) {
+    console.error('❌ Database connection test failed:', error);
+    // Don't exit the process, just log the error
+  }
 });
 
 module.exports = app;

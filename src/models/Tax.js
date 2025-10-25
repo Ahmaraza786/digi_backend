@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     service_type: {
       type: DataTypes.ENUM('material', 'service'),
       allowNull: false,
-      unique: true,
       validate: {
         isIn: {
           args: [['material', 'service']],
@@ -35,6 +34,32 @@ module.exports = (sequelize, DataTypes) => {
         isDecimal: {
           args: true,
           msg: 'Tax percentage must be a decimal number'
+        }
+      }
+    },
+    effective_from: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      validate: {
+        isDate: {
+          args: true,
+          msg: 'Effective from must be a valid date'
+        }
+      }
+    },
+    effective_to: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate: {
+        isDate: {
+          args: true,
+          msg: 'Effective to must be a valid date'
+        },
+        isValidDateRange(value) {
+          if (value && this.effective_from && value <= this.effective_from) {
+            throw new Error('Effective to date must be after effective from date');
+          }
         }
       }
     }

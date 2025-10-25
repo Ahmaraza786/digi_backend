@@ -119,6 +119,8 @@ const getAvailableMaterials = async (req, res) => {
 // Create a new challan
 const createChallan = async (req, res) => {
   try {
+    console.log('=== CHALLAN CREATION STARTED ===');
+    console.log('Request body:', req.body);
     const { purchase_order_id, materials, notes } = req.body;
     const userId = req.user.id;
     
@@ -146,6 +148,56 @@ const createChallan = async (req, res) => {
       ]
     });
     
+    // If quotation is not loaded, try to load it separately
+    if (purchaseOrder && !purchaseOrder.quotation && purchaseOrder.quotation_id) {
+      try {
+        console.log('Quotation not loaded, trying to load separately for quotation_id:', purchaseOrder.quotation_id);
+        const quotation = await Quotation.findByPk(purchaseOrder.quotation_id, {
+          attributes: ['id', 'materials']
+        });
+        if (quotation) {
+          purchaseOrder.quotation = quotation;
+          console.log('Quotation loaded separately:', quotation);
+        }
+        else {
+          console.log('Quotation not found with ID:', purchaseOrder.quotation_id);
+        }
+      } catch (quotationError) {
+        console.error('Error loading quotation separately:', quotationError);
+        // Don't throw, just log the error
+      }
+    }
+    
+    // If customerInfo is not loaded, try to load it separately
+    if (purchaseOrder && !purchaseOrder.customerInfo && purchaseOrder.customer_id) {
+      try {
+        console.log('CustomerInfo not loaded, trying to load separately for customer_id:', purchaseOrder.customer_id);
+        const customer = await Customer.findByPk(purchaseOrder.customer_id, {
+          attributes: ['id', 'customer_name', 'company_name']
+        });
+        if (customer) {
+          purchaseOrder.customerInfo = customer;
+          console.log('Customer loaded separately:', customer);
+        }
+        else {
+          console.log('Customer not found with ID:', purchaseOrder.customer_id);
+        }
+      } catch (customerError) {
+        console.error('Error loading customer separately:', customerError);
+        // Don't throw, just log the error
+      }
+    }
+    
+    console.log('Purchase order data:', {
+      id: purchaseOrder?.id,
+      quotation: purchaseOrder?.quotation,
+      customerInfo: purchaseOrder?.customerInfo,
+      customerId: purchaseOrder?.customer_id,
+      customer: purchaseOrder?.customer,
+      quotationId: purchaseOrder?.quotation?.id,
+      quotationExists: !!purchaseOrder?.quotation
+    });
+    
     if (!purchaseOrder) {
       return res.status(404).json({
         success: false,
@@ -153,7 +205,13 @@ const createChallan = async (req, res) => {
       });
     }
     
-    if (!purchaseOrder.quotation) {
+    if (!purchaseOrder.quotation || !purchaseOrder.quotation.id) {
+      console.log('No quotation found for purchase order:', {
+        purchaseOrderId: purchaseOrder.id,
+        quotationId: purchaseOrder.quotation_id,
+        quotation: purchaseOrder.quotation,
+        hasQuotation: !!purchaseOrder.quotation
+      });
       return res.status(400).json({
         success: false,
         message: 'No quotation found for this purchase order'
@@ -215,18 +273,100 @@ const createChallan = async (req, res) => {
     // Generate challan number
     const challanNo = await generateChallanNumber();
     
-    // Create challan
-    const challan = await Challan.create({
+    console.log('Creating challan with data:', {
       challan_no: challanNo,
       purchase_order_id,
-      quotation_id: purchaseOrder.quotation.id,
-      customer_id: purchaseOrder.customerInfo.id,
-      customer_name: purchaseOrder.customerInfo.customer_name,
-      materials,
-      challan_date: new Date().toISOString().split('T')[0],
-      notes: notes || null,
-      created_by: userId
+      quotation_id: purchaseOrder.quotation?.id,
+      customer_id: purchaseOrder.customerInfo?.id,
+      customer_name: purchaseOrder.customerInfo?.customer_name,
+      materials: materials.length
     });
+    
+    // Handle customer info - if not loaded, try to find customer by name
+    let customerId = null;
+    let customerName = 'Unknown Customer';
+    
+    if (purchaseOrder.customerInfo && purchaseOrder.customerInfo.id) {
+      customerId = purchaseOrder.customerInfo.id;
+      customerName = purchaseOrder.customerInfo.customer_name || purchaseOrder.customer || 'Unknown Customer';
+    } else {
+      // Try to find customer by name if customer_id is null
+      customerName = purchaseOrder.customer || 'Unknown Customer';
+      console.log('CustomerInfo not loaded, trying to find customer by name:', customerName);
+      
+      try {
+        const customer = await Customer.findOne({
+          where: {
+            customer_name: customerName
+          },
+          attributes: ['id', 'customer_name']
+        });
+        
+        if (customer) {
+          customerId = customer.id;
+          console.log('Found customer by name:', { id: customer.id, name: customer.customer_name });
+        } else {
+          console.log('Customer not found by name, creating default customer');
+          // Create a default customer if none exists
+          const defaultCustomer = await Customer.create({
+            customer_name: customerName,
+            company_name: 'Unknown Company',
+            telephone_number: 'N/A',
+            email: 'unknown@example.com',
+            address: 'Unknown Address',
+            created_by: userId
+          });
+          customerId = defaultCustomer.id;
+          console.log('Created default customer:', { id: defaultCustomer.id, name: defaultCustomer.customer_name });
+        }
+      } catch (findCustomerError) {
+        console.error('Error finding customer by name:', findCustomerError);
+        // If we can't find or create a customer, we need to return an error
+        return res.status(400).json({
+          success: false,
+          message: 'Unable to find or create customer for challan',
+          error: 'Customer information is required for challan creation'
+        });
+      }
+    }
+    
+    console.log('Using customer data:', { customerId, customerName });
+    
+    // Final check - ensure we have a valid customer_id
+    if (!customerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Customer ID is required for challan creation',
+        error: 'Unable to determine customer for this purchase order'
+      });
+    }
+    
+    // Create challan
+    let challan;
+    try {
+      challan = await Challan.create({
+        challan_no: challanNo,
+        purchase_order_id,
+        quotation_id: purchaseOrder.quotation.id,
+        customer_id: customerId,
+        customer_name: customerName,
+        materials,
+        challan_date: new Date().toISOString().split('T')[0],
+        notes: notes || null,
+        created_by: userId
+      });
+    } catch (createError) {
+      console.error('Error creating challan:', createError);
+      console.error('Challan data:', {
+        challan_no: challanNo,
+        purchase_order_id,
+        quotation_id: purchaseOrder.quotation?.id,
+        customer_id: customerId,
+        customer_name: customerName,
+        materials: materials.length
+      });
+      throw createError;
+    }
     
     res.status(201).json({
       success: true,

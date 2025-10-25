@@ -196,11 +196,27 @@ const generateQuotationPDF = async (req, res) => {
         : quotation.materials;
     }
 
-    // Fetch tax rates from database
-    const taxes = await db.Tax.findAll();
+    // Fetch tax rates that were effective on the quotation creation date
+    const quotationDate = new Date(quotation.created_at);
+    const taxes = await db.Tax.findAll({
+      where: {
+        effective_from: {
+          [Op.lte]: quotationDate
+        },
+        [Op.or]: [
+          { effective_to: null },
+          { effective_to: { [Op.gte]: quotationDate } }
+        ]
+      },
+      order: [['service_type', 'ASC'], ['effective_from', 'DESC']]
+    });
+    
     const taxRates = {};
     taxes.forEach(tax => {
-      taxRates[tax.service_type] = parseFloat(tax.tax_percent);
+      // Use the most recent tax rate for each service type
+      if (!taxRates[tax.service_type]) {
+        taxRates[tax.service_type] = parseFloat(tax.tax_percent);
+      }
     });
 
     // Calculate tax for each material and totals
@@ -333,11 +349,27 @@ const generateQuotationHTML = async (req, res) => {
         : quotation.materials;
     }
 
-    // Fetch tax rates from database
-    const taxes = await db.Tax.findAll();
+    // Fetch tax rates that were effective on the quotation creation date
+    const quotationDate = new Date(quotation.created_at);
+    const taxes = await db.Tax.findAll({
+      where: {
+        effective_from: {
+          [Op.lte]: quotationDate
+        },
+        [Op.or]: [
+          { effective_to: null },
+          { effective_to: { [Op.gte]: quotationDate } }
+        ]
+      },
+      order: [['service_type', 'ASC'], ['effective_from', 'DESC']]
+    });
+    
     const taxRates = {};
     taxes.forEach(tax => {
-      taxRates[tax.service_type] = parseFloat(tax.tax_percent);
+      // Use the most recent tax rate for each service type
+      if (!taxRates[tax.service_type]) {
+        taxRates[tax.service_type] = parseFloat(tax.tax_percent);
+      }
     });
 
     // Calculate tax for each material and totals
