@@ -1,0 +1,42 @@
+{
+  "name": "digital_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "db:migrate": "npx sequelize-cli db:migrate --config src/config/config.json --migrations-path src/migrations",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo --config src/config/config.json --migrations-path src/migrations",
+    "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --config src/config/config.json --migrations-path src/migrations",
+    "db:seed": "npx sequelize-cli db:seed:all --config src/config/config.json --seeders-path src/seeders",
+    "db:seed:undo": "npx sequelize-cli db:seed:undo:all --config src/config/config.json --seeders-path src/seeders",
+    "db:create": "npx sequelize-cli db:create --config src/config/config.json",
+    "db:drop": "npx sequelize-cli db:drop --config src/config/config.json",
+    "db:reset": "npm run db:drop && npm run db:create && npm run db:migrate && npm run db:seed"
+  },
+  "author": "Ahmad Raza",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "handlebars": "^4.7.8",
+    "helmet": "^8.1.0",
+    "html-pdf-node": "^1.0.8",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "multer-s3": "^2.10.0",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
