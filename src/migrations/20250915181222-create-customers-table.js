@@ -34,6 +34,13 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: true
       },
+      ntn: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+        validate: {
+          len: [0, 50]
+        }
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

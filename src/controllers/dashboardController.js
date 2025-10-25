@@ -24,39 +24,39 @@ const getDashboardSummary = async (req, res) => {
     const poWhereBase = {};
     if (poDateFilter) poWhereBase.created_at = poDateFilter;
 
-    // Invoices counts
+    // Invoices counts with error handling
     const [
       invoicesTotal,
       invoicesPaid,
       invoicesUnpaid,
     ] = await Promise.all([
-      Invoice.count({ where: invoiceWhere }),
-      Invoice.count({ where: { ...invoiceWhere, status: 'paid' } }),
-      Invoice.count({ where: { ...invoiceWhere, status: 'unpaid' } }),
+      Invoice.count({ where: invoiceWhere }).catch(() => 0),
+      Invoice.count({ where: { ...invoiceWhere, status: 'paid' } }).catch(() => 0),
+      Invoice.count({ where: { ...invoiceWhere, status: 'unpaid' } }).catch(() => 0),
     ]);
 
-    // Purchase orders counts
+    // Purchase orders counts with error handling
     const [
       purchaseOrdersReceived,
       purchaseOrdersPending,
     ] = await Promise.all([
-      PurchaseOrder.count({ where: { ...poWhereBase, status: 'delivered' } }),
-      PurchaseOrder.count({ where: { ...poWhereBase, status: 'pending' } }),
+      PurchaseOrder.count({ where: { ...poWhereBase, status: 'delivered' } }).catch(() => 0),
+      PurchaseOrder.count({ where: { ...poWhereBase, status: 'pending' } }).catch(() => 0),
     ]);
 
-    // Amounts from purchase orders by linked quotation.total_price
+    // Amounts from purchase orders by linked quotation.total_price with error handling
     const [amountReceivedRow] = await PurchaseOrder.findAll({
       where: { ...poWhereBase, status: 'delivered' },
       include: [{ model: Quotation, as: 'quotation', attributes: [] }],
       attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('quotation.total_price')), 0), 'total']],
       raw: true,
-    });
+    }).catch(() => [{ total: 0 }]);
     const [amountPendingRow] = await PurchaseOrder.findAll({
       where: { ...poWhereBase, status: 'pending' },
       include: [{ model: Quotation, as: 'quotation', attributes: [] }],
       attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('quotation.total_price')), 0), 'total']],
       raw: true,
-    });
+    }).catch(() => [{ total: 0 }]);
 
     const totalAmountReceived = parseFloat(amountReceivedRow?.total || 0);
     const totalAmountPending = parseFloat(amountPendingRow?.total || 0);
@@ -88,12 +88,12 @@ const getDashboardSummary = async (req, res) => {
     }
     
     const [expensesTotal, expensesAmountRow] = await Promise.all([
-      Expense.count({ where: expenseWhere }),
+      Expense.count({ where: expenseWhere }).catch(() => 0),
       Expense.findAll({
         where: expenseWhere,
         attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('amount')), 0), 'total']],
         raw: true,
-      })
+      }).catch(() => [{ total: 0 }])
     ]);
     
     const totalExpensesAmount = parseFloat(expensesAmountRow[0]?.total || 0);
@@ -125,12 +125,12 @@ const getDashboardSummary = async (req, res) => {
     }
     
     const [salariesTotal, salariesAmountRow] = await Promise.all([
-      EmployeeSalary.count({ where: salaryWhere }),
+      EmployeeSalary.count({ where: salaryWhere }).catch(() => 0),
       EmployeeSalary.findAll({
         where: salaryWhere,
         attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('net_salary')), 0), 'total']],
         raw: true,
-      })
+      }).catch(() => [{ total: 0 }])
     ]);
     
     const totalSalariesAmount = parseFloat(salariesAmountRow[0]?.total || 0);

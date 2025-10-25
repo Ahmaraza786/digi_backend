@@ -39,9 +39,14 @@ module.exports = {
         comment: 'Denormalized customer name for quick access'
       },
       status: {
-        type: Sequelize.ENUM('pending', 'delivered', 'successful'),
+        type: Sequelize.ENUM('pending', 'po_received'),
         allowNull: false,
         defaultValue: 'pending'
+      },
+      title: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
+        comment: 'Title/description of the quotation'
       },
       created_by: {
         type: Sequelize.INTEGER,
@@ -94,6 +99,10 @@ module.exports = {
     
     await queryInterface.addIndex('quotations', ['created_at'], {
       name: 'idx_quotations_created_at'
+    });
+    
+    await queryInterface.addIndex('quotations', ['title'], {
+      name: 'idx_quotations_title'
     });
   },
 

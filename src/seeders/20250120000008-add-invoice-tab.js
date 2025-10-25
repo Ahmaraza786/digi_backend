@@ -2,6 +2,16 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // Add invoice tab
+    await queryInterface.bulkInsert('tabs', [
+      {
+        name: 'invoice',
+        display_name: 'Invoices',
+        description: 'Manage invoices and billing',
+        created_at: new Date()
+      }
+    ], {});
+
     // Get the invoice tab ID
     const [invoiceTab] = await queryInterface.sequelize.query(
       "SELECT id FROM tabs WHERE name = 'invoice'",
@@ -33,9 +43,9 @@ module.exports = {
         }
       ], {});
 
-      // Get admin role ID
+      // Get Admin role ID
       const [adminRole] = await queryInterface.sequelize.query(
-        "SELECT id FROM roles WHERE name = 'admin'",
+        "SELECT id FROM roles WHERE name = 'Admin'",
         { type: Sequelize.QueryTypes.SELECT }
       );
 
@@ -70,6 +80,11 @@ module.exports = {
     // Remove invoice permissions
     await queryInterface.sequelize.query(
       "DELETE FROM permissions WHERE name LIKE 'invoice_%'"
+    );
+
+    // Remove invoice tab
+    await queryInterface.sequelize.query(
+      "DELETE FROM tabs WHERE name = 'invoice'"
     );
   }
 };

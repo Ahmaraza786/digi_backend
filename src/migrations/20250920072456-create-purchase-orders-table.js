@@ -41,6 +41,21 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
+      customer_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'customers',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      material_costs: {
+        type: Sequelize.JSON,
+        allowNull: true,
+        comment: 'JSON object storing actual costs for each material item'
+      },
       created_by: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -96,6 +111,10 @@ module.exports = {
     
     await queryInterface.addIndex('purchase_orders', ['created_at'], {
       name: 'idx_purchase_orders_created_at'
+    });
+    
+    await queryInterface.addIndex('purchase_orders', ['customer_id'], {
+      name: 'idx_purchase_orders_customer_id'
     });
   },
 

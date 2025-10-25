@@ -41,9 +41,9 @@ module.exports = {
       { type: Sequelize.QueryTypes.SELECT }
     );
 
-    // Get superadmin role ID
+    // Get Super Admin role ID
     const [superadminRole] = await queryInterface.sequelize.query(
-      "SELECT id FROM roles WHERE name = 'superadmin'",
+      "SELECT id FROM roles WHERE name = 'Super Admin'",
       { type: Sequelize.QueryTypes.SELECT }
     );
 

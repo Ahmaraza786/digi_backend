@@ -67,28 +67,8 @@ module.exports = {
       name: 'idx_purchase_order_files_uploaded_by'
     });
 
-    // Migrate existing single file data to the new table structure
-    await queryInterface.sequelize.query(`
-      INSERT INTO purchase_order_files (purchase_order_id, file_name, file_path, file_size, file_type, uploaded_by, created_at, updated_at)
-      SELECT 
-        id as purchase_order_id,
-        CASE 
-          WHEN purchase_order_file IS NOT NULL AND purchase_order_file != '' 
-          THEN split_part(purchase_order_file, '/', array_length(string_to_array(purchase_order_file, '/'), 1))
-          ELSE 'migrated_file'
-        END as file_name,
-        purchase_order_file as file_path,
-        0 as file_size,
-        'application/octet-stream' as file_type,
-        1 as uploaded_by,
-        created_at,
-        updated_at
-      FROM purchase_orders 
-      WHERE purchase_order_file IS NOT NULL AND purchase_order_file != ''
-    `);
-
-    // Drop the old purchase_order_file column
-    await queryInterface.removeColumn('purchase_orders', 'purchase_order_file');
+    // Note: Data migration removed as purchase_order_file column doesn't exist
+    // This migration only creates the new table structure for multi-file support
   },
 
   down: async (queryInterface, Sequelize) => {

@@ -56,6 +56,9 @@ The application uses the following database tables:
    # Run migrations
    npm run db:migrate
    
+   # Verify schema (optional but recommended)
+   npm run verify-schema
+   
    # Seed initial data
    npm run db:seed
    ```
@@ -83,6 +86,7 @@ The application uses the following database tables:
 | `npm run db:seed` | Run all seeders |
 | `npm run db:seed:undo` | Undo all seeders |
 | `npm run db:reset` | Drop, create, migrate, and seed database |
+| `npm run verify-schema` | Verify database schema has correct enum values |
 
 ## API Endpoints
 
@@ -133,6 +137,10 @@ src/
 | `DB_USERNAME` | Database username | postgres |
 | `DB_PASSWORD` | Database password | password |
 | `DATABASE_URL` | Full database URL (for production) | - |
+
+## Fresh Installation
+
+For a completely fresh installation, see [FRESH_INSTALLATION.md](./FRESH_INSTALLATION.md) for detailed instructions and verification steps.
 
 ## Development
 

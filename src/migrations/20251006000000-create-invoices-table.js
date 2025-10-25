@@ -40,9 +40,9 @@ module.exports = {
         onDelete: 'SET NULL'
       },
       status: {
-        type: Sequelize.ENUM('not_paid', 'completed'),
+        type: Sequelize.ENUM('unpaid', 'paid'),
         allowNull: false,
-        defaultValue: 'not_paid'
+        defaultValue: 'unpaid'
       },
       total_amount: {
         type: Sequelize.DECIMAL(15, 2),
@@ -59,6 +59,31 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT,
+        allowNull: true
+      },
+      with_hold_tax: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      cheque_amount: {
+        type: Sequelize.DECIMAL(15, 2),
+        allowNull: true
+      },
+      voucher_no: {
+        type: Sequelize.STRING(100),
+        allowNull: true
+      },
+      bank: {
+        type: Sequelize.STRING(100),
+        allowNull: true
+      },
+      deposit_date: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      dw_bank: {
+        type: Sequelize.STRING(100),
         allowNull: true
       },
       created_by: {

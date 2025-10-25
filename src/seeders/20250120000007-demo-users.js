@@ -17,7 +17,8 @@ module.exports = {
         password: adminPassword,
         role_id: 1, // Super Admin role
         is_active: true,
-        created_at: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         username: 'admin',
@@ -25,7 +26,8 @@ module.exports = {
         password: adminPassword,
         role_id: 2, // Admin role
         is_active: true,
-        created_at: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         username: 'manager',
@@ -33,7 +35,8 @@ module.exports = {
         password: userPassword,
         role_id: 3, // Manager role
         is_active: true,
-        created_at: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         username: 'testuser',
@@ -41,7 +44,8 @@ module.exports = {
         password: userPassword,
         role_id: 4, // User role
         is_active: true,
-        created_at: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ], {});
   },

@@ -2,7 +2,7 @@
   "development": {
     "username": "ahmad",
     "password": null,
-    "database": "digital_world",
+    "database": "finale_digi",
     "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres",

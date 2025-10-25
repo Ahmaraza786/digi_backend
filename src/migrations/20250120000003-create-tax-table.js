@@ -11,13 +11,21 @@ module.exports = {
       },
       service_type: {
         type: Sequelize.ENUM('material', 'service'),
-        allowNull: false,
-        unique: true
+        allowNull: false
       },
       tax_percent: {
         type: Sequelize.DECIMAL(5, 2),
         allowNull: false,
         defaultValue: 0.00
+      },
+      effective_from: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      effective_to: {
+        type: Sequelize.DATE,
+        allowNull: true
       },
       created_at: {
         allowNull: false,
