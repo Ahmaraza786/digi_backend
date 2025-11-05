@@ -22,24 +22,6 @@ module.exports = {
         description: 'Manage user roles and permissions',
         created_at: new Date()
       },
-      // {
-      //   name: 'permissions',
-      //   display_name: 'Permission Management',
-      //   description: 'Manage system permissions',
-      //   created_at: new Date()
-      // },
-      // {
-      //   name: 'reports',
-      //   display_name: 'Reports',
-      //   description: 'Generate and view system reports',
-      //   created_at: new Date()
-      // },
-      // {
-      //   name: 'settings',
-      //   display_name: 'Settings',
-      //   description: 'System configuration and settings',
-      //   created_at: new Date()
-      // },
       {
         name: 'material',
         display_name: 'Material Management',
