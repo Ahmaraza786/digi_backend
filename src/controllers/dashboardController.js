@@ -44,13 +44,18 @@ const getDashboardSummary = async (req, res) => {
       PurchaseOrder.count({ where: { ...poWhereBase, status: 'pending' } }).catch(() => 0),
     ]);
 
-    // Amounts from purchase orders by linked quotation.total_price with error handling
-    const [amountReceivedRow] = await PurchaseOrder.findAll({
-      where: { ...poWhereBase, status: 'delivered' },
-      include: [{ model: Quotation, as: 'quotation', attributes: [] }],
-      attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('quotation.total_price')), 0), 'total']],
+    // Amount received from invoices where status='paid' filtered by deposit_date
+    const invoiceAmountDateFilter = buildDateRange(startDate, endDate);
+    const invoiceAmountWhere = { status: 'paid' };
+    if (invoiceAmountDateFilter) invoiceAmountWhere.deposit_date = invoiceAmountDateFilter;
+    
+    const [amountReceivedRow] = await Invoice.findAll({
+      where: invoiceAmountWhere,
+      attributes: [[sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('total_amount')), 0), 'total']],
       raw: true,
     }).catch(() => [{ total: 0 }]);
+    
+    // Amount pending from purchase orders by linked quotation.total_price with error handling
     const [amountPendingRow] = await PurchaseOrder.findAll({
       where: { ...poWhereBase, status: 'pending' },
       include: [{ model: Quotation, as: 'quotation', attributes: [] }],
