@@ -165,7 +165,7 @@ const generateQuotationPDF = async (req, res) => {
         {
           model: db.Customer,
           as: 'customer',
-          attributes: ['id', 'customer_name', 'company_name', 'address', 'company_address', 'telephone_number']
+          attributes: ['id', 'customer_name', 'company_name', 'address', 'company_address', 'telephone_number', 'fax']
         }
       ]
     });
@@ -245,21 +245,26 @@ const generateQuotationPDF = async (req, res) => {
       'CustomerCompanyName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
       'CustomerAddress': quotation.customer?.company_address || quotation.customer?.address || 'N/A',
       'CustomerTelephone': quotation.customer?.telephone_number || 'N/A',
-      'CustomerFax': 'N/A', // Default fax
+      'CustomerFax': quotation.customer?.fax || 'N/A',
       'Date': currentDate,
-      'CustomerName': quotation.customer?.customer_name || 'N/A',
+      'CustomerName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
       'quote_title': quotation.title || 'Quotation',
-      'MATERIAL_ROWS': materials.map((material, index) => `
+      'MATERIAL_ROWS': materials.map((material, index) => {
+        const unitPrice = Number(material.unit_price) || 0;
+        const taxAmount = Number(material.tax_amount) || 0;
+        const rowTotal = (Number(material.quantity) || 0) * unitPrice;
+        return `
         <tr>
           <td class="bord">${index + 1}</td>
           <td class="bord">${material.material_name || 'N/A'}</td>
           <td class="bord">${material.quantity || 0}</td>
           <td class="bord">${material.unit || 'EA'}</td>
-          <td class="bord">${material.unit_price || 0}</td>
-          <td class="bord">${material.tax_amount || 0}</td>
-          <td class="bord">${(material.quantity * material.unit_price) || 0}</td>
+          <td class="bord">${unitPrice.toLocaleString()}</td>
+          <td class="bord">${taxAmount.toLocaleString()}</td>
+          <td class="bord">${rowTotal.toLocaleString()}</td>
         </tr>
-      `).join(''),
+      `;
+      }).join(''),
       'Ex-Total': subTotal.toLocaleString(),
       'GST_Total': totalGST.toLocaleString(),
       'G-Total': grandTotal.toLocaleString()
@@ -319,7 +324,7 @@ const generateQuotationHTML = async (req, res) => {
         {
           model: db.Customer,
           as: 'customer',
-          attributes: ['id', 'customer_name', 'company_name', 'address', 'company_address', 'telephone_number']
+          attributes: ['id', 'customer_name', 'company_name', 'address', 'company_address', 'telephone_number', 'fax']
         }
       ]
     });
@@ -399,21 +404,26 @@ const generateQuotationHTML = async (req, res) => {
       'CustomerCompanyName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
       'CustomerAddress': quotation.customer?.company_address || quotation.customer?.address || 'N/A',
       'CustomerTelephone': quotation.customer?.telephone_number || 'N/A',
-      'CustomerFax': 'N/A', // Default fax
+      'CustomerFax': quotation.customer?.fax || 'N/A',
       'Date': currentDate,
-      'CustomerName': quotation.customer?.customer_name || 'N/A',
+      'CustomerName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
       'quote_title': quotation.title || 'Quotation',
-      'MATERIAL_ROWS': materials.map((material, index) => `
+      'MATERIAL_ROWS': materials.map((material, index) => {
+        const unitPrice = Number(material.unit_price) || 0;
+        const taxAmount = Number(material.tax_amount) || 0;
+        const rowTotal = (Number(material.quantity) || 0) * unitPrice;
+        return `
         <tr>
           <td class="bord">${index + 1}</td>
           <td class="bord">${material.material_name || 'N/A'}</td>
           <td class="bord">${material.quantity || 0}</td>
           <td class="bord">${material.unit || 'EA'}</td>
-          <td class="bord">${material.unit_price || 0}</td>
-          <td class="bord">${material.tax_amount || 0}</td>
-          <td class="bord">${(material.quantity * material.unit_price) || 0}</td>
+          <td class="bord">${unitPrice.toLocaleString()}</td>
+          <td class="bord">${taxAmount.toLocaleString()}</td>
+          <td class="bord">${rowTotal.toLocaleString()}</td>
         </tr>
-      `).join(''),
+      `;
+      }).join(''),
       'Ex-Total': subTotal.toLocaleString(),
       'GST_Total': totalGST.toLocaleString(),
       'G-Total': grandTotal.toLocaleString()
