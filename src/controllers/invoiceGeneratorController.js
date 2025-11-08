@@ -187,7 +187,7 @@ const generateInvoicePDF = async (req, res) => {
       preferCSSPageSize: true,
       width: '8.27in',
       height: '11.69in',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     };
     
     const pdfBuffer = await pdf.generatePdf({ content: htmlContent }, options);

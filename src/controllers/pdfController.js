@@ -65,7 +65,7 @@ const generateChallanPDF = async (req, res) => {
         bottom: '0.2in',
         left: '0.2in'
       },
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     };
     
     const pdfBuffer = await htmlPdf.generatePdf({ content: htmlTemplate }, options);
