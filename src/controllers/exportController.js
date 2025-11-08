@@ -291,6 +291,7 @@ const generateQuotationPDF = async (req, res) => {
       preferCSSPageSize: true,
       width: '8.27in',
       height: '11.69in',
+      executablePath: '/usr/bin/google-chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     };
     

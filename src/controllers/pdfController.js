@@ -65,6 +65,7 @@ const generateChallanPDF = async (req, res) => {
         bottom: '0.2in',
         left: '0.2in'
       },
+      executablePath: '/usr/bin/google-chrome',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     };
     
