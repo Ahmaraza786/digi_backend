@@ -44,7 +44,7 @@ const generateChallanPDF = async (req, res) => {
     const templateData = {
       challanDate: challan.challan_date,
       challanNo: challan.challan_no,
-      customerName: challan.customer_name,
+      customerName: challan.customer?.company_name || challan.customer?.customer_name || challan.customer_name || 'N/A',
       purchaseOrderNo: challan.purchaseOrder.purchase_order_no,
       materialsTable: generateMaterialsTable(challan.materials)
     };
@@ -146,7 +146,7 @@ const generateChallanPreview = async (req, res) => {
     const templateData = {
       challanDate: challan.challan_date,
       challanNo: challan.challan_no,
-      customerName: challan.customer_name,
+      customerName: challan.customer?.company_name || challan.customer?.customer_name || challan.customer_name || 'N/A',
       purchaseOrderNo: challan.purchaseOrder.purchase_order_no,
       materialsTable: generateMaterialsTable(challan.materials)
     };

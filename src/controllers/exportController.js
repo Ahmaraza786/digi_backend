@@ -247,7 +247,7 @@ const generateQuotationPDF = async (req, res) => {
       'CustomerTelephone': quotation.customer?.telephone_number || 'N/A',
       'CustomerFax': quotation.customer?.fax || 'N/A',
       'Date': currentDate,
-      'CustomerName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
+      'CustomerName': quotation.customer?.customer_name || quotation.customer?.company_name || 'N/A',
       'quote_title': quotation.title || 'Quotation',
       'MATERIAL_ROWS': materials.map((material, index) => {
         const unitPrice = Number(material.unit_price) || 0;
@@ -407,7 +407,7 @@ const generateQuotationHTML = async (req, res) => {
       'CustomerTelephone': quotation.customer?.telephone_number || 'N/A',
       'CustomerFax': quotation.customer?.fax || 'N/A',
       'Date': currentDate,
-      'CustomerName': quotation.customer?.company_name || quotation.customer?.customer_name || 'N/A',
+      'CustomerName': quotation.customer?.customer_name || quotation.customer?.company_name || 'N/A',
       'quote_title': quotation.title || 'Quotation',
       'MATERIAL_ROWS': materials.map((material, index) => {
         const unitPrice = Number(material.unit_price) || 0;
