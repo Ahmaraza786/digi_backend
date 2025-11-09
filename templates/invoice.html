@@ -15,11 +15,12 @@
         body {
             font-family: 'Arial', sans-serif;
             background-color: white;
-            padding: 20px;
+            padding: 0;
             color: #333;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            font-size: 11px;
         }
 
         .invoice-container {
@@ -27,78 +28,101 @@
             margin: 0 auto;
             background-color: white;
             flex: 1;
-            padding-bottom: 80px;
+            padding: 10px 20px;
         }
 
         .invoice-header {
             text-align: center;
-            padding: 30px 20px;
+            padding: 10px 20px;
             background-color: white;
         }
 
         .invoice-title {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             text-decoration: underline;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             color: #2c3e50;
         }
 
         .header-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 12px;
+            font-size: 11px;
         }
 
         .client-invoice-section {
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
-            margin-bottom: 20px;
-            gap: 20px;
+            padding: 0;
+            margin-bottom: 12px;
+            gap: 15px;
         }
 
         .info-box {
             border: 2px solid #333;
-            padding: 15px;
+            padding: 10px;
             flex: 1;
             background-color: #fff;
         }
 
         .info-box h3 {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .info-box p {
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 10px;
+            line-height: 1.3;
+            margin-bottom: 2px;
+        }
+        
+        .quotation-title {
+            font-weight: bold;
+            font-size: 11px;
             margin-bottom: 3px;
+        }
+        
+        .invoice-description {
+            font-size: 10px;
+            color: #555;
+            margin-top: 3px;
         }
 
         .items-table {
-            margin: 0 20px;
+            margin: 0;
             border-collapse: collapse;
-            width: calc(100% - 40px);
+            width: 100%;
             border: 2px solid #333;
         }
 
         .items-table th {
             background-color: #d3d3d3;
-            padding: 12px;
+            padding: 8px 6px;
             text-align: center;
             font-weight: bold;
             border: 1px solid #333;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         .items-table td {
-            padding: 12px;
+            padding: 8px 6px;
             border: 1px solid #333;
-            font-size: 13px;
+            font-size: 10px;
             background-color: white;
+        }
+        
+        .material-name {
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .material-description {
+            font-size: 9px;
+            color: #666;
+            margin-top: 2px;
         }
 
         .item-description {
@@ -112,7 +136,7 @@
         }
 
         .empty-row {
-            height: 40px;
+            height: 25px;
         }
 
         .total-section {
@@ -141,9 +165,9 @@
         }
 
         .company-footer {
-            padding: 20px;
+            padding: 10px 0;
             text-align: left;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
             color: #2c3e50;
         }
@@ -329,7 +353,12 @@
             <div class="info-box">
                 <h3>Invoice No. {{invoiceId}}</h3>
                 <p><strong>Description:</strong></p>
-                <p>{{invoiceDescription}}</p>
+                {{#if quotationTitle}}
+                <p class="quotation-title">{{quotationTitle}}</p>
+                {{/if}}
+                {{#if invoiceDescription}}
+                <p class="invoice-description">{{invoiceDescription}}</p>
+                {{/if}}
             </div>
         </div>
 
@@ -348,7 +377,12 @@
                 {{#each materials}}
                 <tr>
                     <td class="qty-cell">{{add @index 1}}</td>
-                    <td class="item-description">{{this.material_name}}</td>
+                    <td class="item-description">
+                        <div class="material-name">{{this.material_name}}</div>
+                        {{#if this.description}}
+                        <div class="material-description">{{this.description}}</div>
+                        {{/if}}
+                    </td>
                     <td class="qty-cell">{{this.quantity}} {{this.unit}}</td>
                     <td class="rate-cell">{{this.unit_price}}</td>
                     <td class="amount-cell">{{this.total_price}}</td>

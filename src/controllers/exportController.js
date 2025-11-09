@@ -196,6 +196,22 @@ const generateQuotationPDF = async (req, res) => {
         : quotation.materials;
     }
 
+    // Fetch material descriptions from Material model
+    const materialIds = materials.map(m => m.material_id).filter(id => id);
+    const materialDetails = await db.Material.findAll({
+      where: { id: { [Op.in]: materialIds } },
+      attributes: ['id', 'name', 'description']
+    });
+    
+    // Create a map for quick lookup
+    const materialMap = {};
+    materialDetails.forEach(material => {
+      materialMap[material.id] = {
+        name: material.name,
+        description: material.description
+      };
+    });
+
     // Fetch tax rates that were effective on the quotation creation date
     const quotationDate = new Date(quotation.created_at);
     const taxes = await db.Tax.findAll({
@@ -253,10 +269,22 @@ const generateQuotationPDF = async (req, res) => {
         const unitPrice = Number(material.unit_price) || 0;
         const taxAmount = Number(material.tax_amount) || 0;
         const rowTotal = (Number(material.quantity) || 0) * unitPrice;
+        
+        // Get material details
+        const materialInfo = materialMap[material.material_id];
+        const materialName = material.material_name || materialInfo?.name || 'Unknown Material';
+        const materialDescription = materialInfo?.description;
+        
+        // Format description column with material name (bold) and description below
+        let descriptionCell = `<strong>${materialName}</strong>`;
+        if (materialDescription) {
+          descriptionCell += `<br><span style="font-size: 0.9em; color: #666;">${materialDescription}</span>`;
+        }
+        
         return `
         <tr>
           <td class="bord">${index + 1}</td>
-          <td class="bord">${material.material_name || 'N/A'}</td>
+          <td class="bord" style="text-align: left;">${descriptionCell}</td>
           <td class="bord">${material.quantity || 0}</td>
           <td class="bord">${material.unit || 'EA'}</td>
           <td class="bord">${unitPrice.toLocaleString()}</td>
@@ -356,6 +384,22 @@ const generateQuotationHTML = async (req, res) => {
         : quotation.materials;
     }
 
+    // Fetch material descriptions from Material model
+    const materialIds = materials.map(m => m.material_id).filter(id => id);
+    const materialDetails = await db.Material.findAll({
+      where: { id: { [Op.in]: materialIds } },
+      attributes: ['id', 'name', 'description']
+    });
+    
+    // Create a map for quick lookup
+    const materialMap = {};
+    materialDetails.forEach(material => {
+      materialMap[material.id] = {
+        name: material.name,
+        description: material.description
+      };
+    });
+
     // Fetch tax rates that were effective on the quotation creation date
     const quotationDate = new Date(quotation.created_at);
     const taxes = await db.Tax.findAll({
@@ -413,10 +457,22 @@ const generateQuotationHTML = async (req, res) => {
         const unitPrice = Number(material.unit_price) || 0;
         const taxAmount = Number(material.tax_amount) || 0;
         const rowTotal = (Number(material.quantity) || 0) * unitPrice;
+        
+        // Get material details
+        const materialInfo = materialMap[material.material_id];
+        const materialName = material.material_name || materialInfo?.name || 'Unknown Material';
+        const materialDescription = materialInfo?.description;
+        
+        // Format description column with material name (bold) and description below
+        let descriptionCell = `<strong>${materialName}</strong>`;
+        if (materialDescription) {
+          descriptionCell += `<br><span style="font-size: 0.9em; color: #666;">${materialDescription}</span>`;
+        }
+        
         return `
         <tr>
           <td class="bord">${index + 1}</td>
-          <td class="bord">${material.material_name || 'N/A'}</td>
+          <td class="bord" style="text-align: left;">${descriptionCell}</td>
           <td class="bord">${material.quantity || 0}</td>
           <td class="bord">${material.unit || 'EA'}</td>
           <td class="bord">${unitPrice.toLocaleString()}</td>
