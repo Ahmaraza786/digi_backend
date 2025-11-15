@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -120,12 +119,17 @@
 
         .item-description {
             text-align: left;
-            width: 60%;
+            width: 50%;
         }
 
-        .qty-cell, .unit-cell, .rate-cell, .amount-cell {
+        .qty-cell, .unit-cell {
             text-align: center;
             width: 10%;
+        }
+
+        .rate-cell, .amount-cell {
+            text-align: center;
+            width: 12.5%;
         }
 
         .empty-row {
@@ -133,28 +137,59 @@
         }
 
         .total-section {
-            background-color: white;
-        }
-
-        .total-label {
-            font-weight: bold;
-            text-align: right;
-            padding-right: 15px;
-        }
-
-        .total-amount {
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .grand-total-row {
-            background-color: white;
+            background-color: #999;
+            color: black;
             font-weight: bold;
         }
         
-        .grand-total-row .total-label,
-        .grand-total-row .total-amount {
-            background-color: #d3d3d3;
+        .total-section td.bord {
+            border: none;
+            background-color: white;
+        }
+        
+        .total-section td.total-label {
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            border-left: 1px solid #333;
+            background-color: #999;
+            color: black;
+            font-weight: bold;
+        }
+        
+        .total-section td.total-value {
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            border-right: 1px solid #333;
+            border-left: 1px solid #333;
+            background-color: #999;
+            color: black;
+            font-weight: bold;
+        }
+
+        .grand-total-row {
+            background-color: #999;
+            font-weight: bold;
+        }
+        
+        .grand-total-row td.bord {
+            border: none;
+            background-color: white;
+        }
+        
+        .grand-total-row td.total-label {
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            border-left: 1px solid #333;
+            background-color: #999;
+            color: black;
+            font-weight: bold;
+        }
+        
+        .grand-total-row td.total-value {
+            border: 1px solid #333;
+            background-color: #999;
+            color: black;
+            font-weight: bold;
         }
 
         .company-footer {
@@ -317,6 +352,10 @@
             flex-wrap: wrap;
             justify-content: center;
         }
+        .items-table{
+            border-left: none;
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -408,30 +447,30 @@
                     <td></td>
                 </tr>
                 
-                <!-- Total calculations -->
+                <!-- Total calculations - Updated with border formatting -->
                 <tr class="total-section">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
                     <td class="total-label">Total:</td>
-                    <td class="total-amount">{{subTotal}}</td>
+                    <td class="total-value">{{subTotal}}</td>
                 </tr>
                 <tr class="total-section">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
                     <td class="total-label">GST {{taxPercentage}}%</td>
-                    <td class="total-amount">{{gstAmount}}</td>
+                    <td class="total-value">{{gstAmount}}</td>
                 </tr>
                 <tr class="grand-total-row">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
+                    <td class="bord"></td>
                     <td class="total-label">G-Total</td>
-                    <td class="total-amount">{{grandTotal}}</td>
+                    <td class="total-value">{{grandTotal}}</td>
                 </tr>
             </tbody>
         </table>
