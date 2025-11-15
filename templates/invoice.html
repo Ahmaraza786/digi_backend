@@ -123,9 +123,9 @@
             width: 60%;
         }
 
-        .qty-cell, .rate-cell, .amount-cell {
+        .qty-cell, .unit-cell, .rate-cell, .amount-cell {
             text-align: center;
-            width: 13.33%;
+            width: 10%;
         }
 
         .empty-row {
@@ -360,6 +360,7 @@
                     <th>Sr.#</th>
                     <th>Item Description</th>
                     <th>Qty.</th>
+                    <th>Unit</th>
                     <th>Rate</th>
                     <th>Amount</th>
                 </tr>
@@ -372,7 +373,8 @@
                     <td class="item-description">
                         <div class="material-name">{{this.material_name}}</div>
                     </td>
-                    <td class="qty-cell">{{this.quantity}} {{this.unit}}</td>
+                    <td class="qty-cell">{{this.quantity}}</td>
+                    <td class="unit-cell">{{this.unit}}</td>
                     <td class="rate-cell">{{this.unit_price}}</td>
                     <td class="amount-cell">{{this.total_price}}</td>
                 </tr>
@@ -381,7 +383,8 @@
                 <tr>
                     <td class="sr-cell">01</td>
                     <td class="item-description">General Invoice Item</td>
-                    <td class="qty-cell">01 EA</td>
+                    <td class="qty-cell">01</td>
+                    <td class="unit-cell">EA</td>
                     <td class="rate-cell">{{totalAmount}}</td>
                     <td class="amount-cell">{{totalAmount}}</td>
                 </tr>
@@ -394,8 +397,10 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr class="empty-row">
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -408,6 +413,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td class="total-label">Total:</td>
                     <td class="total-amount">{{subTotal}}</td>
                 </tr>
@@ -415,10 +421,12 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td class="total-label">GST {{taxPercentage}}%</td>
                     <td class="total-amount">{{gstAmount}}</td>
                 </tr>
                 <tr class="grand-total-row">
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
