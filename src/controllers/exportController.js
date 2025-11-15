@@ -310,7 +310,7 @@ const generateQuotationPDF = async (req, res) => {
       format: 'A4',
       margin: {
         top: "10px",     // Minimal top margin
-        bottom: "120px", // Space for footer (reduced from 120px)
+        bottom: "120px", // Space for footer
         left: "20px",
         right: "20px"
       },
