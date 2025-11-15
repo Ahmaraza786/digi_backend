@@ -9,23 +9,40 @@ const getSalariesWithPagination = async (req, res) => {
     const offset = page * size;
 
     // Filter parameters
-    const { month, year, employee_id, is_finalized } = req.query;
+    const { month, year, employee_id, is_finalized, search } = req.query;
     let whereClause = {};
+    let includeClause = [
+      {
+        model: Employee,
+        as: 'employee',
+        attributes: ['id', 'name', 'designation']
+      }
+    ];
 
     if (month) whereClause.month = month;
     if (year) whereClause.year = year;
     if (employee_id) whereClause.employee_id = employee_id;
     if (is_finalized !== undefined) whereClause.is_finalized = is_finalized === 'true';
 
-    const { count, rows } = await EmployeeSalary.findAndCountAll({
-      where: whereClause,
-      include: [
+    // Add search filter for employee name
+    if (search && search.trim()) {
+      includeClause = [
         {
           model: Employee,
           as: 'employee',
-          attributes: ['id', 'name', 'designation']
+          attributes: ['id', 'name', 'designation'],
+          where: {
+            name: {
+              [Op.like]: `%${search.trim()}%`
+            }
+          }
         }
-      ],
+      ];
+    }
+
+    const { count, rows } = await EmployeeSalary.findAndCountAll({
+      where: whereClause,
+      include: includeClause,
       limit: size,
       offset: offset,
       order: [['created_at', 'DESC']]
@@ -109,32 +126,49 @@ const generateSalaries = async (req, res) => {
   }
 };
 
-// Update salary entry
+// Update salary entry (allows updating finalized salaries)
 const updateSalary = async (req, res) => {
   try {
     const { id } = req.params;
-    const { basic_salary, bonus, deductions } = req.body;
+    const { basic_salary, bonus, deductions, is_finalized } = req.body;
 
     const salary = await EmployeeSalary.findByPk(id);
     if (!salary) {
       return res.status(404).json({ error: 'Salary entry not found' });
     }
 
-    if (salary.is_finalized) {
-      return res.status(400).json({ error: 'Cannot update finalized salary' });
-    }
+    // Allow updating finalized salaries - removed the restriction
+    // Users can edit finalized salaries and they will remain finalized unless explicitly changed
 
     // Calculate net salary
     const netSalary = parseFloat(basic_salary) + parseFloat(bonus || 0) - parseFloat(deductions || 0);
 
-    await salary.update({
+    const updateData = {
       basic_salary,
       bonus: bonus || 0,
       deductions: deductions || 0,
       net_salary: netSalary
+    };
+
+    // Preserve or update finalized status if provided
+    if (is_finalized !== undefined) {
+      updateData.is_finalized = is_finalized;
+    }
+
+    await salary.update(updateData);
+
+    // Return updated salary with employee details
+    const updatedSalary = await EmployeeSalary.findByPk(id, {
+      include: [
+        {
+          model: Employee,
+          as: 'employee',
+          attributes: ['id', 'name', 'designation']
+        }
+      ]
     });
 
-    res.json(salary);
+    res.json(updatedSalary);
   } catch (error) {
     console.error('Error updating salary:', error);
     if (error.name === 'SequelizeValidationError') {
@@ -144,7 +178,7 @@ const updateSalary = async (req, res) => {
   }
 };
 
-// Finalize salaries for a month/year
+// Finalize salaries for a month/year (allows re-finalizing)
 const finalizeSalaries = async (req, res) => {
   try {
     const { month, year } = req.body;
@@ -153,23 +187,39 @@ const finalizeSalaries = async (req, res) => {
       return res.status(400).json({ error: 'Month and year are required' });
     }
 
-    const salaries = await EmployeeSalary.findAll({
-      where: { month, year, is_finalized: false }
+    // Get all salaries for this month/year (both finalized and unfinalized)
+    const allSalaries = await EmployeeSalary.findAll({
+      where: { month, year }
     });
 
-    if (salaries.length === 0) {
-      return res.status(400).json({ error: 'No unfinalized salaries found for this month/year' });
+    if (allSalaries.length === 0) {
+      return res.status(400).json({ error: 'No salary entries found for this month/year' });
     }
 
-    // Update all salaries to finalized
+    // Count how many were not finalized
+    const unfinalizedCount = allSalaries.filter(s => !s.is_finalized).length;
+    const alreadyFinalizedCount = allSalaries.filter(s => s.is_finalized).length;
+
+    // Update all salaries to finalized (including those already finalized - re-finalize)
     await EmployeeSalary.update(
       { is_finalized: true },
-      { where: { month, year, is_finalized: false } }
+      { where: { month, year } }
     );
 
+    let message;
+    if (alreadyFinalizedCount > 0 && unfinalizedCount > 0) {
+      message = `Finalized ${unfinalizedCount} salary entries and re-confirmed ${alreadyFinalizedCount} already finalized entries for ${month}/${year}`;
+    } else if (alreadyFinalizedCount > 0 && unfinalizedCount === 0) {
+      message = `Re-finalized ${alreadyFinalizedCount} salary entries for ${month}/${year}`;
+    } else {
+      message = `Finalized ${unfinalizedCount} salary entries for ${month}/${year}`;
+    }
+
     res.json({
-      message: `Finalized ${salaries.length} salary entries for ${month}/${year}`,
-      count: salaries.length
+      message,
+      count: allSalaries.length,
+      newlyFinalized: unfinalizedCount,
+      alreadyFinalized: alreadyFinalizedCount
     });
   } catch (error) {
     console.error('Error finalizing salaries:', error);
