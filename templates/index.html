@@ -13,9 +13,9 @@
 
         /* A4 Page Setup */
         @page {
-            size: A4;
-            margin: 0.2in;
-        }
+        size: A4;
+        margin: 15mm 15mm 35mm 15mm; /* Bottom margin for footer */
+    }
 
         body {
             font-family: Arial, sans-serif;
@@ -24,9 +24,6 @@
             margin: 0;
             font-size: 12px;
             width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .document {
@@ -34,15 +31,10 @@
             margin: 0;
             background: white;
             box-shadow: none;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            width: 100%;
         }
 
         .header {
@@ -123,7 +115,7 @@
         }
 
         .content {
-            padding: 20px; /* Reduced from 30px */
+            padding: 20px;
         }
 
         .company-info {
@@ -284,29 +276,7 @@
             font-size: 12px;
         }
 
-        .footer {
-            background-color: #333;
-            color: white;
-            padding: 12px;
-            text-align: center;
-            font-size: 10px;
-            line-height: 1.4;
-            margin-top: auto;
-            flex-shrink: 0;
-        }
-
-        .footer a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .footer-icons {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px; /* Reduced from 10px */
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        /* Footer is now handled by PDF library */
 
         @media (max-width: 768px) {
             .company-info {
@@ -349,7 +319,34 @@
                 box-shadow: none;
                 max-width: none;
             }
+            .header {
+                page-break-after: avoid;
+            }
+            .company-info {
+                page-break-inside: avoid;
+            }
+            .quote-table {
+                page-break-inside: auto;
+                border-collapse: collapse;
+            }
+            .quote-table thead {
+                display: table-header-group;
+            }
+            .quote-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            .total-section {
+                page-break-inside: avoid;
+            }
+            .terms-section {
+                page-break-inside: avoid;
+            }
+            .closing, .signature {
+                page-break-inside: avoid;
+            }
         }
+
     </style>
 </head>
 <body>
@@ -480,17 +477,8 @@
         </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <div class="footer-icons">
-                <span>📍 512 A-1 Block, Gurumangat Road Near Nisar Art Press Gulberg-III Lahore</span>
-                <span>📞 Ph: +92-42-35887770</span>
-                <span>✉️ sales@digitalworld.pk</span>
-                <span>🌐 www.digitalworld.pk</span>
-                <span>📱 +92-300-4336230</span>
-                <span>📘 digitalworldlahore</span>
-            </div>
-        </div>
+        <!-- Footer is now handled by PDF library's footerTemplate -->
+
     </div>
 </body>
 </html>
