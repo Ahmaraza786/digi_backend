@@ -318,7 +318,7 @@ const generateQuotationPDF = async (req, res) => {
       displayHeaderFooter: true,
       headerTemplate: '<div style="font-size: 10px;"></div>', // Empty header with required style
       footerTemplate: `
-        <div style="font-size: 10px; width: 100%;height: 40px; margin: 0; padding: 0;">
+        <div style="font-size: 10px; width: 100%;height: 30px;  padding: 0;">
         <div style="width: 100%; padding: 12px 25px; background-color: #333 !important; 
 color: white; text-align: center; line-height: 1.4; 
 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
@@ -338,7 +338,7 @@ box-sizing: border-box; display: block;">
       `,
       preferCSSPageSize: false,
       executablePath: '/usr/bin/google-chrome',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb', '--disable-print-preview']
     };
     
     const pdfBuffer = await pdf.generatePdf({ content: htmlContent }, options);
