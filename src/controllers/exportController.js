@@ -310,7 +310,7 @@ const generateQuotationPDF = async (req, res) => {
       format: 'A4',
       margin: {
         top: "10px",     // Minimal top margin
-        bottom: "70px",  // Space for footer (reduced to prevent extra page)
+        bottom: "100px",  // Space for footer (reduced to prevent extra page)
         left: "20px",
         right: "20px"
       },
@@ -319,7 +319,7 @@ const generateQuotationPDF = async (req, res) => {
       headerTemplate: '<div style="font-size: 10px;"></div>', // Empty header with required style
       footerTemplate: `
         <div style="font-size: 10px; width: 100%;height: 40px; margin: 0; padding: 0;">
-        <div style="width: 100%; padding: 12px 30px; background-color: #333 !important; 
+        <div style="width: 100%; padding: 12px 25px; background-color: #333 !important; 
 color: white; text-align: center; line-height: 1.4; 
 -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
 box-sizing: border-box; display: block;">
