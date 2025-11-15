@@ -55,26 +55,48 @@ const generateChallanPDF = async (req, res) => {
       htmlTemplate = htmlTemplate.replace(new RegExp(placeholder, 'g'), templateData[key]);
     });
     
-    // Generate PDF using html-pdf-node
+    // Generate PDF using html-pdf-node with footer
     const options = {
       format: 'A4',
-      printBackground: true,
       margin: {
-        top: '0.2in',
-        right: '0.2in',
-        bottom: '0.2in',
-        left: '0.2in'
+        top: "10px",     // Minimal top margin
+        bottom: "120px", // Space for footer
+        left: "20px",
+        right: "20px"
       },
+      printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: '<div style="font-size: 10px;"></div>', // Empty header with required style
+      footerTemplate: `
+        <div style="font-size: 10px; width: 100%;height: 40px; margin: 0; padding: 0;">
+          <div style="width: 100%; padding: 12px 20px; background-color: #333 !important; color: white; text-align: center; line-height: 1.4; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; margin: 0;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; font-size: 9px;">
+              <span style="white-space: nowrap;">📍 512 A-1 Block, Gurumangat Road Near Nisar Art Press Gulberg-III Lahore</span>
+              <span style="white-space: nowrap;">📞 Ph: +92-42-35887770</span>
+               <span style="white-space: nowrap;">📱 +92-300-4336230</span>
+              <span style="color: #333; white-space: nowrap;">Life</span>
+              <span style="white-space: nowrap;">✉️ sales@digitalworld.pk</span>
+              <span style="white-space: nowrap;">🌐 www.digitalworld.pk</span>
+              <span style="white-space: nowrap;">📘 digitalworldlahore</span>
+            </div>
+          </div>
+        </div>
+      `,
+      preferCSSPageSize: false,
       executablePath: '/usr/bin/google-chrome',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb']
     };
     
     const pdfBuffer = await htmlPdf.generatePdf({ content: htmlTemplate }, options);
+    console.log('Challan PDF generated successfully with footer, size:', pdfBuffer.length);
     
     // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="challan-${challan.challan_no}.pdf"`);
     res.setHeader('Content-Length', pdfBuffer.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     
     // Send PDF buffer
     res.send(pdfBuffer);
