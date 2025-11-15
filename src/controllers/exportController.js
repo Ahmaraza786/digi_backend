@@ -309,8 +309,8 @@ const generateQuotationPDF = async (req, res) => {
     const options = {
       format: 'A4',
       margin: {
-        top: "80px",    // Space for header if needed
-        bottom: "120px", // Space for footer
+        top: "10px",     // Minimal top margin
+        bottom: "100px", // Space for footer (reduced from 120px)
         left: "20px",
         right: "20px"
       },
@@ -318,14 +318,14 @@ const generateQuotationPDF = async (req, res) => {
       displayHeaderFooter: true,
       headerTemplate: '<div style="font-size: 10px;"></div>', // Empty header with required style
       footerTemplate: `
-        <div style="font-size: 10px; width: 100%; margin: 0; padding: 0;">
-          <div style="width: 100%; padding: 12px 20px; background-color: #333 !important; color: white; text-align: center; line-height: 1.4; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">
+        <div style="font-size: 10px; width: 100%;height: 30px; margin: 0; padding: 0;">
+          <div style="width: 100%; padding: 12px 20px; background-color: #333 !important; color: white; text-align: center; line-height: 1.4; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; margin: 0;">
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; font-size: 9px;">
               <span style="white-space: nowrap;">📍 512 A-1 Block, Gurumangat Road Near Nisar Art Press Gulberg-III Lahore</span>
               <span style="white-space: nowrap;">📞 Ph: +92-42-35887770</span>
+               <span style="white-space: nowrap;">📱 +92-300-4336230</span>
               <span style="white-space: nowrap;">✉️ sales@digitalworld.pk</span>
               <span style="white-space: nowrap;">🌐 www.digitalworld.pk</span>
-              <span style="white-space: nowrap;">📱 +92-300-4336230</span>
               <span style="white-space: nowrap;">📘 digitalworldlahore</span>
             </div>
           </div>

@@ -14,12 +14,13 @@
         /* A4 Page Setup */
         @page {
         size: A4;
-        margin: 15mm 15mm 35mm 15mm; /* Bottom margin for footer */
+        margin: 3mm 15mm 0 15mm; /* Minimal top, bottom margin for footer */
     }
 
         body {
             font-family: Arial, sans-serif;
             background-color: white;
+            min-height: 100%;
             padding: 0;
             margin: 0;
             font-size: 12px;
@@ -28,6 +29,7 @@
 
         .document {
             width: 100%;
+            min-height: 297mm; /* exact A4 height */
             margin: 0;
             background: white;
             box-shadow: none;
